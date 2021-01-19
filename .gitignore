@@ -1,0 +1,2 @@
+# removing credentials.yml, so you have to provide the credentials on your own for each checkout. Safety first.
+*credentials.yml

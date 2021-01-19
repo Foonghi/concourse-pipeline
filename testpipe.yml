@@ -1,0 +1,40 @@
+---
+resources:
+  - name: git-repository
+    type: git
+    source:
+      uri: ((github_project_path))
+      branch: main
+      private_key: ((github_private_key))
+
+jobs:
+  - name: build-git
+    public: false 
+    plan:
+      - get: git-repository
+        trigger: true
+      - task: build-zipfile
+        config:
+          platform: centos
+          image_resource:
+            type: docker-image
+            source:
+              repository: javantonfrank/concourse-centos-curl-zip 
+              tag: 'latest'
+          inputs:
+            - name: git-repository
+          outputs:
+            - name: my-http-resource
+          run:
+            path: /bin/sh
+            args:
+            - -c
+            - |
+              echo helloworld
+              cp -R ./git-repository apiproxy           
+              echo 'checking git download'
+              echo $(ls -a)            
+              zip -r apiproxy.zip apiproxy
+              echo $(ls -a)
+              echo 'zipping file...'
+              curl -vvv -X POST -H Content-Type="multipart/form-data" -u '((apigee_user)):((apigee_pass))'  -F "file=@apiproxy.zip" https://api.enterprise.apigee.com/v1/organizations/((apigee-host))/apis?action=import&name=((api-proxy-name))
