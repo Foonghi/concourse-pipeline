@@ -19,7 +19,7 @@ jobs:
           image_resource:
             type: docker-image
             source:
-              repository: eamonwoortman/alpine-curl-zip
+              repository: javantonfrank/concourse-centos-curl-zip
               tag: 'latest'
           inputs:
             - name: git-repository
